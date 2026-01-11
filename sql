@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict vxVif4eKoqfyx7ZncbtsjFJSE0dFVg5h7oG9T8UMQFL3SOax9EZTW3F7CdEiIRa
+\restrict iTjfsCDuG3kkCtWuSLaZxFBe7EktaoTYjl6X7NdSYmLJRK2HxNOdqJarapNFLPn
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
 
--- Started on 2026-01-11 11:25:27
+-- Started on 2026-01-11 11:57:19
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,6 +20,25 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- TOC entry 4 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO pg_database_owner;
+
+--
+-- TOC entry 5049 (class 0 OID 0)
+-- Dependencies: 4
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
 
 SET default_tablespace = '';
 
@@ -121,7 +140,23 @@ CREATE TABLE public.modules (
 ALTER TABLE public.modules OWNER TO postgres;
 
 --
--- TOC entry 4876 (class 2606 OID 16478)
+-- TOC entry 224 (class 1259 OID 16495)
+-- Name: rooms; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.rooms (
+    room_number character varying(20) NOT NULL,
+    room_type character varying(50) NOT NULL,
+    room_capacity integer NOT NULL,
+    is_available boolean DEFAULT true NOT NULL,
+    CONSTRAINT rooms_room_capacity_check CHECK ((room_capacity > 0))
+);
+
+
+ALTER TABLE public.rooms OWNER TO postgres;
+
+--
+-- TOC entry 4886 (class 2606 OID 16478)
 -- Name: groups groups_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -130,7 +165,7 @@ ALTER TABLE ONLY public.groups
 
 
 --
--- TOC entry 4870 (class 2606 OID 16448)
+-- TOC entry 4880 (class 2606 OID 16448)
 -- Name: lecturers lecturers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -139,7 +174,7 @@ ALTER TABLE ONLY public.lecturers
 
 
 --
--- TOC entry 4878 (class 2606 OID 16494)
+-- TOC entry 4888 (class 2606 OID 16494)
 -- Name: module_requiremnts module_requiremnts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -148,7 +183,7 @@ ALTER TABLE ONLY public.module_requiremnts
 
 
 --
--- TOC entry 4872 (class 2606 OID 16464)
+-- TOC entry 4882 (class 2606 OID 16464)
 -- Name: modules modules_module_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -157,7 +192,7 @@ ALTER TABLE ONLY public.modules
 
 
 --
--- TOC entry 4874 (class 2606 OID 16462)
+-- TOC entry 4884 (class 2606 OID 16462)
 -- Name: modules modules_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -165,11 +200,20 @@ ALTER TABLE ONLY public.modules
     ADD CONSTRAINT modules_pkey PRIMARY KEY (module_id);
 
 
--- Completed on 2026-01-11 11:25:27
+--
+-- TOC entry 4890 (class 2606 OID 16505)
+-- Name: rooms rooms_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.rooms
+    ADD CONSTRAINT rooms_pkey PRIMARY KEY (room_number);
+
+
+-- Completed on 2026-01-11 11:57:19
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict vxVif4eKoqfyx7ZncbtsjFJSE0dFVg5h7oG9T8UMQFL3SOax9EZTW3F7CdEiIRa
+\unrestrict iTjfsCDuG3kkCtWuSLaZxFBe7EktaoTYjl6X7NdSYmLJRK2HxNOdqJarapNFLPn
 
