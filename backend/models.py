@@ -2,8 +2,26 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text, DateT
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
-
 from database import Base
+# backend/models.py
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+
+# ... tus imports y modelos arriba ...
+
+class Availability(Base):
+    __tablename__ = "availabilities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lecturer_id = Column(Integer, ForeignKey("lecturers.id"), nullable=False)
+
+    day_of_week = Column(String, nullable=False)     # "Monday", "Tuesday", etc.
+    start_time = Column(String, nullable=False)      # "09:00"
+    end_time = Column(String, nullable=False)        # "11:00"
+    is_active = Column(Boolean, default=True)
+
+    lecturer = relationship("Lecturer")
+
 
 class StudyProgram(Base):
     __tablename__ = "study_programs"
@@ -60,7 +78,7 @@ class Lecturer(Base):
     employment_type = Column(String(50), nullable=False)
     personal_email = Column(String(200), nullable=True)
     mdh_email = Column(String(200), nullable=True)
-    phone = Column(String(50), nullable=True)
+    #phone = Column(String(50), nullable=True)
 
 
 class Group(Base):

@@ -1,5 +1,29 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any, Literal
+# backend/schemas.py
+from pydantic import BaseModel
+
+# ... tus schemas arriba ...
+
+class AvailabilityBase(BaseModel):
+    lecturer_id: int
+    day_of_week: str
+    start_time: str
+    end_time: str
+    is_active: bool = True
+
+class AvailabilityCreate(AvailabilityBase):
+    pass
+
+class AvailabilityUpdate(AvailabilityBase):
+    pass
+
+class AvailabilityOut(AvailabilityBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
 
 
 class SpecializationCreate(BaseModel):
@@ -64,6 +88,7 @@ class LecturerCreate(BaseModel):
     personal_email: Optional[str] = None
     mdh_email: Optional[str] = None
     phone: Optional[str] = None
+
 
 
 class LecturerResponse(LecturerCreate):
