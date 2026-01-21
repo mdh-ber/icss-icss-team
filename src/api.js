@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL; 
+const API_BASE_URL = process.env.REACT_APP_API_URL|| "http://localhost:5000";
 const API_URL = API_BASE_URL;
 
 async function request(path, options = {}) {
@@ -11,8 +11,7 @@ async function request(path, options = {}) {
     },
     ...options,
   });
-  return res.json();
-}
+
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
@@ -120,30 +119,13 @@ const api = {
   createAvailability(payload) {
     return request("/availabilities/", { method: "POST", body: JSON.stringify(payload) });
   },
-  // (Si todavía no tienes PUT/DELETE en backend, los dejamos igual y si falla lo ajustamos)
   updateAvailability(id, payload) {
     return request(`/availabilities/${id}`, { method: "PUT", body: JSON.stringify(payload) });
   },
   deleteAvailability(id) {
     return request(`/availabilities/${id}`, { method: "DELETE" });
   },
-  // --- AVAILABILITIES ---
-  getAvailabilities: async () => {
-    const response = await axios.get(`${API_URL}/availabilities/`);
-    return response.data;
-  },
-  createAvailability: async (data) => {
-    const response = await axios.post(`${API_URL}/availabilities/`, data);
-    return response.data;
-  },
-  updateAvailability: async (id, data) => {
-    const response = await axios.put(`${API_URL}/availabilities/${id}`, data);
-    return response.data;
-  },
-  deleteAvailability: async (id) => {
-    const response = await axios.delete(`${API_URL}/availabilities/${id}`);
-    return response.data;
-  },
+  
 };
 
 export default api;

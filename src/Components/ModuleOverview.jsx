@@ -112,13 +112,12 @@ export default function ModuleOverview() {
 
   const [draft, setDraft] = useState({
     moduleName: "",
-    roomType: "Lecture Classroom",
-    sessionsPerWeek: 1,
+    moduleCode: "",
+    ects: 5,
     semester: 1,
-    totalSessions: 14,
-    classDuration: 90,
-    numberOfStudents: 25,
-    onsiteOnline: "Hybrid",
+    studyProgram: "",
+    specialization: "",
+    typeOfModule: "Lecture",
   });
 
   async function loadModules() {
@@ -141,13 +140,14 @@ export default function ModuleOverview() {
     setEditingId(null);
     setDraft({
       moduleName: "",
-      roomType: "Lecture Classroom",
-      sessionsPerWeek: 1,
+      moduleCode: "",
+      ects: 5,
       semester: 1,
-      totalSessions: 14,
-      classDuration: 90,
-      numberOfStudents: 25,
-      onsiteOnline: "Hybrid",
+      studyProgram: "",
+      specialization: "",
+      typeOfModule: "Lecture",
+      assesmentType: "Written Exam",
+      
     });
     setFormMode("add");
   }
@@ -156,13 +156,13 @@ export default function ModuleOverview() {
     setEditingId(row.module_id);
     setDraft({
       moduleName: row.module_name,
-      roomType: row.room_type,
-      sessionsPerWeek: row.sessions_per_week,
+      moduleCode: row.module_code,
+      ects: row.ects,
       semester: row.semester,
-      totalSessions: row.total_sessions,
-      classDuration: row.class_duration,
-      numberOfStudents: row.number_of_students,
-      onsiteOnline: row.onsite_online,
+      studyProgram: row.study_program,
+      specialization: row.specialization || "",
+      typeOfModule: row.type_of_module,
+      assessmentType: row.assessment_type,
     });
     setFormMode("edit");
   }
@@ -172,13 +172,13 @@ export default function ModuleOverview() {
 
     const payload = {
       module_name: draft.moduleName.trim(),
-      room_type: draft.roomType,
-      sessions_per_week: Number(draft.sessionsPerWeek),
+      module_code: draft.moduleCode.trim(),
+      ects: Number(draft.ects),
       semester: Number(draft.semester),
-      total_sessions: Number(draft.totalSessions),
-      class_duration: Number(draft.classDuration),
-      number_of_students: Number(draft.numberOfStudents),
-      onsite_online: draft.onsiteOnline,
+      study_program: draft.studyProgram,
+      specialization: draft.specialization,
+      type_of_module: draft.typeOfModule,
+      assessment_type: draft.assessmentType,
     };
 
     try {
@@ -190,10 +190,18 @@ export default function ModuleOverview() {
       await loadModules();
       setFormMode("overview");
     } catch (e) {
-      console.error(e);
       alert("Backend error while saving module.");
     }
   }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return modules;
+    return modules.filter((m) =>
+      m.module_name.toLowerCase().includes(q) ||
+      m.module_code.toLowerCase().includes(q) ||
+      m.study_program?.toLowerCase().includes(q)
+    );
+  }, [modules, query]);
 
   async function remove(id) {
     if (!window.confirm("Delete this module?")) return;
@@ -205,28 +213,16 @@ export default function ModuleOverview() {
       alert("Backend error while deleting module.");
     }
   }
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return modules;
-    return modules.filter((m) =>
-      m.module_name.toLowerCase().includes(q) ||
-      m.room_type.toLowerCase().includes(q)
-    );
-  }, [modules, query]);
-
-  return (
+return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.title}>Module Overview</h2>
-        <button style={{...styles.btn, ...styles.primaryBtn}} onClick={openAdd}>
-          + New Module
-        </button>
+        <h2 style={styles.title}>Module Management</h2>
+        <button style={{...styles.btn, ...styles.primaryBtn}} onClick={openAdd}>+ New Module</button>
       </div>
 
       <input
         style={styles.searchBar}
-        placeholder="Search modules..."
+        placeholder="Search by name, code, or program..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -235,27 +231,25 @@ export default function ModuleOverview() {
         <table style={styles.table}>
           <thead style={styles.thead}>
             <tr>
-              <th style={styles.th}>Name</th>
-              <th style={styles.th}>Room Req.</th>
+              <th style={styles.th}>Code</th>
+              <th style={styles.th}>Module Name</th>
+              <th style={styles.th}>ECTS</th>
               <th style={styles.th}>Sem.</th>
-              <th style={styles.th}>Duration</th>
-              <th style={styles.th}>Students</th>
-              <th style={{...styles.th, textAlign:'center'}}>Mode</th>
+              <th style={styles.th}>Study Program</th>
+              <th style={styles.th}>Type / Assessment</th>
               <th style={{...styles.th, textAlign:'right'}}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((m) => (
               <tr key={m.module_id} style={styles.tr}>
+                <td style={styles.td}><code>{m.module_code}</code></td>
                 <td style={styles.td}><strong>{m.module_name}</strong></td>
-                <td style={styles.td}>{m.room_type}</td>
+                <td style={styles.td}>{m.ects}</td>
                 <td style={styles.td}>{m.semester}</td>
-                <td style={styles.td}>{m.class_duration} min</td>
-                <td style={styles.td}>{m.number_of_students}</td>
-                <td style={{...styles.td, textAlign:'center'}}>
-                  <span style={styles.statusBadge(m.onsite_online)}>
-                    {m.onsite_online}
-                  </span>
+                <td style={styles.td}>{m.study_program}</td>
+                <td style={styles.td}>
+                    <small>{m.type_of_module} / {m.assessment_type}</small>
                 </td>
                 <td style={{...styles.td, textAlign:'right'}}>
                   <button style={{...styles.btn, ...styles.editBtn}} onClick={() => openEdit(m)}>Edit</button>
@@ -272,79 +266,64 @@ export default function ModuleOverview() {
         <div style={styles.modalOverlay}>
             <div style={styles.modalContent}>
                 <div style={{display:'flex', justifyContent:'space-between', marginBottom:'20px'}}>
-                    <h3 style={{margin:0}}>{formMode === "add" ? "Create Module" : "Edit Module"}</h3>
+                    <h3 style={{margin:0}}>{formMode === "add" ? "Define New Module" : "Edit Module Properties"}</h3>
                     <button onClick={() => setFormMode("overview")} style={{border:'none', background:'transparent', fontSize:'1.5rem', cursor:'pointer'}}>×</button>
                 </div>
 
-                <div style={styles.formGroup}>
-                    <label style={styles.label}>Module Name</label>
-                    <input
-                      style={styles.input}
-                      value={draft.moduleName}
-                      onChange={e => setDraft({...draft, moduleName: e.target.value})}
-                      placeholder="e.g. Database Systems"
-                    />
+                <div style={{display:'flex', gap:'15px', marginBottom:'15px'}}>
+                    <div style={{flex:2}}>
+                        <label style={styles.label}>Module Name</label>
+                        <input style={styles.input} value={draft.moduleName} onChange={e => setDraft({...draft, moduleName: e.target.value})} />
+                    </div>
+                    <div style={{flex:1}}>
+                        <label style={styles.label}>Module Code</label>
+                        <input style={styles.input} value={draft.moduleCode} onChange={e => setDraft({...draft, moduleCode: e.target.value})} />
+                    </div>
                 </div>
 
                 <div style={{display:'flex', gap:'15px', marginBottom:'15px'}}>
                     <div style={{flex:1}}>
-                        <label style={styles.label}>Room Requirement</label>
-                        <select
-                          style={styles.input}
-                          value={draft.roomType}
-                          onChange={e => setDraft({...draft, roomType: e.target.value})}
-                        >
-                          <option value="Lecture Classroom">Lecture Classroom</option>
+                        <label style={styles.label}>ECTS</label>
+                        <input type="number" style={styles.input} value={draft.ects} onChange={e => setDraft({...draft, ects: e.target.value})} />
+                    </div>
+                    <div style={{flex:1}}>
+                        <label style={styles.label}>Semester Number</label>
+                        <input type="number" style={styles.input} value={draft.semester} onChange={e => setDraft({...draft, semester: e.target.value})} />
+                    </div>
+                </div>
+
+                <div style={styles.formGroup}>
+                    <label style={styles.label}>Study Program</label>
+                    <input style={styles.input} value={draft.studyProgram} onChange={e => setDraft({...draft, studyProgram: e.target.value})} placeholder="e.g. Business Information Technology" />
+                </div>
+
+                <div style={styles.formGroup}>
+                    <label style={styles.label}>Specialization</label>
+                    <input style={styles.input} value={draft.specialization} onChange={e => setDraft({...draft, specialization: e.target.value})} />
+                </div>
+
+                <div style={{display:'flex', gap:'15px', marginBottom:'15px'}}>
+                    <div style={{flex:1}}>
+                        <label style={styles.label}>Module Types(aligned with room_type) </label>
+                        <select style={styles.input} value={draft.typeOfModule} onChange={e => setDraft({...draft, typeOfModule: e.target.value})}>
+                          <option value="Lecture">Lecture</option>
                           <option value="Computer Lab">Computer Lab</option>
-                          <option value="Game Design">Game Design</option>
                           <option value="Seminar">Seminar</option>
                         </select>
                     </div>
                     <div style={{flex:1}}>
-                        <label style={styles.label}>Mode</label>
-                        <select
-                          style={styles.input}
-                          value={draft.onsiteOnline}
-                          onChange={e => setDraft({...draft, onsiteOnline: e.target.value})}
-                        >
-                          <option value="Hybrid">Hybrid</option>
-                          <option value="Onsite">Onsite</option>
-                          <option value="Online">Online</option>
+                        <label style={styles.label}>Assessment Type</label>
+                        <select style={styles.input} value={draft.assessmentType} onChange={e => setDraft({...draft, assessmentType: e.target.value})}>
+                          <option value="Written Exam">Written Exam</option>
+                          <option value="Project Work">Project Work</option>
+                          <option value="Oral Exam">Oral Exam</option>
                         </select>
-                    </div>
-                </div>
-
-                <div style={{display:'flex', gap:'15px', marginBottom:'15px'}}>
-                    <div style={{flex:1}}>
-                        <label style={styles.label}>Semester</label>
-                        <input type="number" style={styles.input} value={draft.semester} onChange={e => setDraft({...draft, semester: e.target.value})} />
-                    </div>
-                    <div style={{flex:1}}>
-                        <label style={styles.label}>Sessions/Week</label>
-                        <input type="number" style={styles.input} value={draft.sessionsPerWeek} onChange={e => setDraft({...draft, sessionsPerWeek: e.target.value})} />
-                    </div>
-                    <div style={{flex:1}}>
-                        <label style={styles.label}>Total Sessions</label>
-                        <input type="number" style={styles.input} value={draft.totalSessions} onChange={e => setDraft({...draft, totalSessions: e.target.value})} />
-                    </div>
-                </div>
-
-                <div style={{display:'flex', gap:'15px', marginBottom:'15px'}}>
-                    <div style={{flex:1}}>
-                        <label style={styles.label}>Duration (min)</label>
-                        <input type="number" style={styles.input} value={draft.classDuration} onChange={e => setDraft({...draft, classDuration: e.target.value})} />
-                    </div>
-                    <div style={{flex:1}}>
-                        <label style={styles.label}>Student Count</label>
-                        <input type="number" style={styles.input} value={draft.numberOfStudents} onChange={e => setDraft({...draft, numberOfStudents: e.target.value})} />
                     </div>
                 </div>
 
                 <div style={{marginTop: '25px', display:'flex', justifyContent:'flex-end', gap:'10px'}}>
                     <button style={{...styles.btn, background:'#f8f9fa', border:'1px solid #ddd'}} onClick={() => setFormMode("overview")}>Cancel</button>
-                    <button style={{...styles.btn, ...styles.primaryBtn}} onClick={save}>
-                        {formMode === "add" ? "Create" : "Save Changes"}
-                    </button>
+                    <button style={{...styles.btn, ...styles.primaryBtn}} onClick={save}>Save Module</button>
                 </div>
             </div>
         </div>
