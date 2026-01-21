@@ -1,16 +1,35 @@
 import { useState } from "react";
 
 type Room = {
-  room_number: string;
-  room_type: string;
-  room_capacity: number;
-  is_available: boolean;
+  id: number;
+  name: string;
+  capacity: number;
+  type: string;
+  status: boolean;
+  equipment?: string | null;
+  location?: string | null;
 };
 
 export default function RoomsPage() {
   const [rooms] = useState<Room[]>([
-    { room_number: "A101", room_type: "Lecture", room_capacity: 40, is_available: true },
-    { room_number: "B202", room_type: "Lab", room_capacity: 25, is_available: false },
+    {
+      id: 1,
+      name: "A101",
+      capacity: 40,
+      type: "Lecture",
+      status: true,
+      equipment: "Projector",
+      location: "Building A, Floor 1",
+    },
+    {
+      id: 2,
+      name: "B202",
+      capacity: 25,
+      type: "Lab",
+      status: false,
+      equipment: null,
+      location: "Building B, Floor 2",
+    },
   ]);
 
   return (
@@ -20,24 +39,30 @@ export default function RoomsPage() {
       <table border={1} cellPadding={10} style={{ marginTop: 12, width: "100%" }}>
         <thead>
           <tr>
-            <th>Room Number</th>
+            <th>ID</th>
+            <th>Name</th>
             <th>Type</th>
             <th>Capacity</th>
-            <th>Available</th>
+            <th>Status</th>
+            <th>Equipment</th>
+            <th>Location</th>
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {rooms.map((room) => (
-            <tr key={room.room_number}>
-              <td>{room.room_number}</td>
-              <td>{room.room_type}</td>
-              <td>{room.room_capacity}</td>
-              <td>{room.is_available ? "Yes" : "No"}</td>
+            <tr key={room.id}>
+              <td>{room.id}</td>
+              <td>{room.name}</td>
+              <td>{room.type}</td>
+              <td>{room.capacity}</td>
+              <td>{room.status ? "Active" : "Inactive"}</td>
+              <td>{room.equipment ?? "-"}</td>
+              <td>{room.location ?? "-"}</td>
               <td>
-                <button onClick={() => alert("Edit " + room.room_number)}>Edit</button>{" "}
-                <button onClick={() => alert("Delete " + room.room_number)}>Delete</button>
+                <button onClick={() => alert("Edit " + room.id)}>Edit</button>{" "}
+                <button onClick={() => alert("Delete " + room.id)}>Delete</button>
               </td>
             </tr>
           ))}
