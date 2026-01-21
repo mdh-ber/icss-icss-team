@@ -5,6 +5,7 @@ import models
 import schemas
 from database import engine, get_db
 import os
+from fastapi import UploadFile, File
 
 app = FastAPI(title="Study Program Backend")
 
@@ -385,3 +386,24 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+MAX_MB = 10
+ALLOWED_TYPES = {
+    "text/csv",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # 1) type check
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="Only CSV/XLSX allowed")
+
+    # 2) size check
+    data = await file.read()
+    if len(data) > MAX_MB * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large")
+
+    return {"ok": True, "filename": file.filename}
+
