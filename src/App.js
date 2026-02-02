@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import SemesterForm from "./components/SemesterForm";
+import SemesterList from "./components/SemesterList";
+import axios from "axios";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [semesters, setSemesters] = useState([]);
+    const [editingSemester, setEditingSemester] = useState(null);
+
+    // Fetch semesters from backend
+    const fetchSemesters = async () => {
+        try {
+            const res = await axios.get("/api/semesters");
+            setSemesters(res.data);
+        } catch (err) {
+            console.error("Error fetching semesters:", err);
+        }
+    };
+
+    const clearEditing = () => setEditingSemester(null);
+
+    useEffect(() => {
+        fetchSemesters();
+    }, []);
+
+    return (
+        <div>
+            <h1>University AI Scheduler</h1>
+
+            {/* Form only once */}
+            <SemesterForm
+                fetchSemesters={fetchSemesters}
+                editingSemester={editingSemester}
+                clearEditing={clearEditing}
+            />
+
+            {/* Table */}
+            <SemesterList
+                semesters={semesters}
+                fetchSemesters={fetchSemesters}
+                setEditingSemester={setEditingSemester}
+            />
+        </div>
+    );
 }
 
 export default App;
